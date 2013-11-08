@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Online Apollo Guidance Computer Simulator</title>
+    <style>
+        @font-face {
+            font-family: seven;
+            src: url('./digital-7-mono-italic.ttf')
+        }
+
+        .bigdigit {
+            font-family: seven; 
+            font-size: 40px; 
+            color: #00FF00; 
+            background-color: #555555; 
+            width: 120px; 
+            height: 40px;
+            margin: 0px;               
+            position: absolute;
+        }
+        .smalldigit {
+            font-family: seven; 
+            font-size: 40px; 
+            color: #00FF00; 
+            background-color: #555555; 
+            width: 40px; 
+            height: 40px;            
+            margin: 0px;
+            position: absolute;
+        }
+        .light {
+		    width: 60px;
+    		height: 30px;
+	    	line-height: 30px;
+	    	border: solid black 1px;
+	    	text-align: center;	
+	    	vertical-align: middle;	
+	    	font-family: sans-serif;
+	    	font-size: 11px;
+	    	margin: 5px;
+	    	position: absolute;
+            background-color: #888888;
+	    }
+        .smalllight {
+		    width: 40px;
+    		height: 25px;
+	    	line-height: 25px;
+            background-color: #00FF00;	    	
+	    	text-align: center;	
+	    	vertical-align: middle;	
+	    	font-family: sans-serif;
+	    	font-size: 10px;
+	    	margin: 0px;
+	    	position: absolute;
+            background-color: #00FF00;
+	    }	
+	    .key {
+    		width: 50px;
+	    	height: 50px;
+	    	line-height: 40px;
+	    	font-family: sans-serif;
+	    	font-size: 20px;		
+	    	position: absolute;
+	    	background-color: #555555;
+	    	color: white;
+	    }
+        #pro {
+    		width: 50px;
+	    	height: 50px;
+	    	line-height: 40px;
+	    	font-family: sans-serif;
+	    	font-size: 12px;		
+	    	position: absolute;
+	    	background-color: #555555;
+	    	color: white;
+	    }
+        .tinykey {
+    		width: 25px;
+	    	height: 25px;
+	    	line-height: 15px;
+	    	font-family: sans-serif;
+	    	font-size: 10px;		
+	    	position: relative;
+	    	background-color: #555555;
+	    	color: white;
+	    }
+        li {
+            margin: 10px;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  </head>
+  <body>
+
+<div style="position: relative; left: 100px; top: 0; width: 760px;">
+    <div id="warning" style="width:740px; border:2px solid black; display:none; margin:10px; padding: 5px;"></div>
+
+    <h2>
+        Moonjs: An Online Apollo Guidance Computer (AGC) Simulator
+    </h2>
+    <hr>
+</div>
+
+<div style="position: relative; left: 248px; top: 0; width: 415px; height: 485px; border: solid black 2px; background-color: #DDDDDD;">
+	<div style="position: absolute; left: 20px; top: 10px; width: 140px; height: 280px; border: solid black 2px;">
+		<div id="uplink_acty" class="light" style="left: 0px; top: 0px; line-height: 15px;">UPLINK<br>ACTY</div>
+		<div id="no_att" class="light" style="left: 0px; top: 40px;">NO ATT</div>
+		<div id="stby" class="light" style="left: 0px; top: 80px;">STBY</div>
+		<div id="key_rel" class="light" style="left: 0px; top: 120px;">KEY REL</div>
+		<div id="opr_err" class="light" style="left: 0px; top: 160px;">OPR ERR</div>
+		<div class="light" style="left: 0px; top: 200px;">&nbsp;</div>
+		<div class="light" style="left: 0px; top: 240px;">&nbsp;</div>
+	
+		<div id="temp" class="light" style="left: 70px; top: 0px;">TEMP</div>
+		<div id="gimball_lock" class="light" style="left: 70px; top: 40px; line-height: 15px;">GIMBALL<br>LOCK</div>
+		<div id="prog" class="light" style="left: 70px; top: 80px;">PROG</div>
+		<div id="restart" class="light" style="left: 70px; top: 120px;">RESTART</div>
+		<div id="tracker" class="light" style="left: 70px; top: 160px;">TRACKER</div>
+		<div id="alt" class="light" style="left: 70px; top: 200px;">ALT</div>
+		<div id="vel" class="light" style="left: 70px; top: 240px;">VEL</div>
+	</div>
+
+    <div style="position: absolute; width:130px; height: 265px; right: 20px; top: 10px; border: solid black 2px; background-color: black;">
+        <div id="comp_acty" class="light" style="left: 5px; top: 5px; line-height: 15px; width: 40px;">COMP<br>ACTY</div>
+        <div id="prog_label" class="smalllight" style="right: 5px; top: 5px;">PROG</div>
+        <div id="prog00" class="smalldigit" style="right:5px; top:30px;">00</div>
+        <div id="verb_label" class="smalllight" style="left: 5px; top: 75px;">VERB</div>
+        <div id="verb00" class="smalldigit" style="left:5px; top:100px;">00</div>
+        <div id="noun_label" class="smalllight" style="right: 5px; top: 75px;">NOUN</div>
+        <div id="noun00" class="smalldigit" style="right:5px; top:100px;">00</div>
+        <div id="R1" class="bigdigit" style="left:5px; top:140px;">+00000</div>
+        <div id="R2" class="bigdigit" style="left:5px; top:180px;">+00000</div>
+        <div id="R3" class="bigdigit" style="left:5px; top:220px;">+00000</div>
+    </div>
+
+	<div style="position: absolute; left: 10px; top: 300px; width: 390px; height: 170px; border: solid black 2px;">
+		<button class="key" name="17" style="left: 5px; top: 30px; font-size: 12px;">VERB</button>
+		<button class="key" name="31" style="left: 5px; top: 85px; font-size: 12px;">NOUN</button>
+		<button class="key" name="26" style="left: 60px; top: 5px;">+</button>
+		<button class="key" name="27" style="left: 60px; top: 60px;">-</button>
+		<button class="key" name="16" style="left: 60px; top: 115px;">0</button>
+		<button class="key" name="7" style="left: 115px; top: 5px;">7</button>
+		<button class="key" name="4" style="left: 115px; top: 60px;">4</button>
+		<button class="key" name="1" style="left: 115px; top: 115px;">1</button>
+		<button class="key" name="8" style="left: 170px; top: 5px;">8</button>
+		<button class="key" name="5" style="left: 170px; top: 60px;">5</button>
+		<button class="key" name="2" style="left: 170px; top: 115px;">2</button>
+		<button class="key" name="9" style="left: 225px; top: 5px;">9</button>
+		<button class="key" name="6" style="left: 225px; top: 60px;">6</button>
+		<button class="key" name="3" style="left: 225px; top: 115px;">3</button>
+		<button class="key" name="30" style="left: 280px; top: 5px; font-size: 12px;">CLR</button>
+		<button id="pro" style="left: 280px; top: 60px">PRO</button>
+		<button class="key" name="25" style="left: 280px; top: 115px; font-size: 12px; line-height: 20px;">KEY<br>REL</button>
+		<button class="key" name="28" style="left: 335px; top: 30px; font-size: 12px;">ENTR</button>
+		<button class="key" name="18" style="left: 335px; top: 85px; font-size: 12px;">RSET</button>
+	</div>
+</div>
+
+<div style="position: relative; left: 100px; top: 30px; width: 760px; background-color: #EEEEEE;">
+Moonjs is an online Apollo Guidance Computer (AGC) simulator. It is a port of <a href="http://www.ibiblio.org/apollo/">Virtual AGC</a> by <a href="info@sandroid.org">Ronald Burkey</a> from C to javascript/<a href="http://asmjs.org">asm.js</a> using the <a href="https://github.com/kripken/emscripten/wiki">Emscripten compiler</a>. 
+<p>
+AGC was the main computer system of the Apollo program that successfully landed 12 astronauts on Moon. There was one AGC on each of the Apollo Command Modules and another one on each Lunar Module. There was also a second backup computer system called Abort Guidance System (AGS) on the Lunar Modules, which is simulated by Virtual AGC, but not the current version of Moonjs. 
+<p>
+Astronauts interacted with AGC by using DSKY, a combination of 7-segment numerical displays, indicator lights and a simple keypad, which is simulated on this page. 
+
+<div><img src="Apollo_DSKY_interface.svg.png"></div>
+
+The simulated DSKY communicates with a simulated AGC, which in turn runs a copy of Colossus 249, the flight software that flew on the Apollo 9 Command Module. 
+
+DSKY human interface was built around the concept of <i>Verbs</i> and <i>Nouns</i>. For example, Verb 06 can be used to display the value of near 100 different memory locations selected based on the given Noun. 
+
+<h4>Some Examples Codes:</h4>
+    <ul>
+        <li>Test the DSKY lamps (digits and indicators) by entering 
+            <span>
+                <button class="tinykey" style="width: 50px;">VERB</button>
+                <button class="tinykey">3</button>
+                <button class="tinykey">5</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button>
+            </span>.            
+        </li>
+        <li>Try 
+            <span>
+                <button class="tinykey" style="width: 50px;">VERB</button>
+                <button class="tinykey">1</button>
+                <button class="tinykey">6</button>
+                <button class="tinykey" style="width: 50px;">NOUN</button> 
+                <button class="tinykey">6</button>
+                <button class="tinykey">5</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button>
+            </span>. 
+            This command monitors the current time. The lower 5-digit display shows seconds,
+            the middle one minutes and the topmost one hours elapsed since AGC powered up.
+        </li>
+        <li>Start program P00, the idle program, by entering 
+            <span>
+                <button class="tinykey" style="width: 50px;">VERB</button>
+                <button class="tinykey">3</button>
+                <button class="tinykey">7</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button> 
+                <button class="tinykey">0</button>
+                <button class="tinykey">0</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button>
+            </span>. 
+        </li>
+        <li>Enter 
+            <span>
+                <button class="tinykey" style="width: 50px;">VERB</button>
+                <button class="tinykey">9</button>
+                <button class="tinykey">1</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button> 
+            </span>.
+            It shows the checksum of the first bank of the fixed memory (the so called core-ropes in AGC terminology).
+            The fixed memory is divided into 38 banks, each containing 1024 (1K) 15-bits words. The top 5-digit display 
+            shows the checksum in octal, which should be either the bank number or its 1-complement (e.g., for bank 3 
+            either a value of 00003 or 77774 is acceptable). The middle row is the bank number and the third row is a 
+            <i>bugger word</i> appended to the end of each bank to make the checksum the correct value. By entering
+            <span>
+                <button class="tinykey" style="width: 50px;">VERB</button>
+                <button class="tinykey">3</button>
+                <button class="tinykey">3</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button> 
+            </span>
+            or pressing 
+            <span>
+                <button class="tinykey" style="width: 50px;">PRO</button>
+            </span>,
+            you can get the statistics for the next bank.
+        </li>
+        <li>Let's try some spaceflight related programs! Enter
+            <span>
+                <button class="tinykey" style="width: 50px;">VERB</button>
+                <button class="tinykey">0</button>
+                <button class="tinykey">6</button>
+                <button class="tinykey" style="width: 50px;">NOUN</button>
+                <button class="tinykey">6</button>
+                <button class="tinykey">2</button>
+                <button class="tinykey" style="width: 50px;">ENTR</button> 
+            </span>.
+            It shows the current velocity (top row), altitude rate (middle row) and altitude (botton row). 
+            Unfortunatelly, we are not going to space today, so all three show 00000 and will continue to
+            do so. During an actual launch (or a simulated one), they would update with current values. 
+            If instead of Verb 06, we use Verb 16, the same values are shown and updated constantly until 
+            a differnt command is entered. In fact, this program was used during the boost phase of Saturn V 
+            launches to allow astronauts monitor the progress of the launch vehicle. 
+        </li>
+    </ul>
+    For many more examples and details about AGC, its programming and operation, two great sources are
+    the excellent <a href="http://www.ibiblio.org/apollo/">Virtual AGC</a> website by Ronald Burkey and 
+    "The Apollo guidance computer : architecture and operation" by Frank O'Brien. The wikipedia 
+    <a href="http://en.wikipedia.org/wiki/Apollo_Guidance_Computer">page</a> for AGC also contains 
+    lots of useful information and a comprehensive bibliography. 
+
+<h4>Why Javascript?</h4>
+    Recent advances in the javascript language - such as optimized engines, ahead-of-time (AOT) compilation, and asm.js - 
+    make it possible to write computationally extensive applications in javascript. My previous experience
+    with online javascript-based simulation (<a href="svtsim.com/svtsim.html">svtsim</a> and <a href="svtsim.com/hemosim.html">hemosim</a>)
+    was very positive and convinced me of the suitablity of the HTML5/javascript combination in writing 
+    portable, easy-to-use simulators. <b>Moonjs</b> is the logical next step that uses Emscripten compiler to convert
+    existing C code into asm.js, a highly-optimizable subset of javascript. 
+<footer>
+    <hr> 
+    @2013 Shahriar Iravanian (<a href="mail://siravan@svtsim.com">siravan@svtsim.com</a>) 
+</footer>
+
+</div>
+
+
+<script type="text/javascript">
+    if(!window.console){    // for older IE
+        window.console = {
+            log: function() {}
+        }
+    }
+    
+    var Module = {
+        'canvas': document.createElement('canvas') || {},
+        'setStatus': function(msg){ console.log('status: '+msg); },
+         'print': function(text) { console.log(text); }
+    };
+
+    if(!window.ArrayBuffer){
+        $('#warning').html('<b>Warning!</b> Moonjs cannot run because your browser does not support typed arrays.'
+            + ' Please upgrade to a modern browser, such as Firefox 4+, Chrome 7+, Safari 5.1+, Opera 11.6+, and IE 10+.');            
+        $('#warning').css('display', 'block');
+    }
+</script>
+
+<script src='agc.js'></script>
+
+<script type="text/javascript">
+    "use strict";
+
+    // the main interface functions to the emscripten compiled code    
+    var advance = Module.cwrap('advance', 'number', []);                        // int advance()
+    var sendPort = Module.cwrap('sendPort', 'number', ['number', 'number']);    // int sendPort(port, val)    
+    var scanPort = Module.cwrap('scanPort', 'number', ['number']);              // int scanPort(mask)
+    var readPort = Module.cwrap('scanPort', 'number', []);                      // int readPort()
+
+    // A module encapsulating most DSKY related states and functions
+    var dsky = (function(){   
+        var digits = '000000+00000+00000+00000'.split('');  // digits hold the current state of DSKY in an array of characters (strings of length==1)
+        var sign1p = 0;     // sign[1|2][p|n] holds the sign bits for the three 5-digit displays R1, R2 and R3
+        var sign1m = 0;
+        var sign2p = 0;
+        var sign2m = 0;
+        var sign3p = 0;
+        var sign3m = 0;
+        var status8 = 0;    // status bits of AGC output channel 010
+        var status9 = 0;    // status bits of AGC output channel 011
+        var status11 = 0;
+        var phase = 0;      // a timer used for blinking Verb and Nouns
+        var flag = 0;       // update flag; bit 0: digits, bit 1: status8, bit 2: status 9
+        
+        function getDigit(c){
+            var d = 'E';
+            switch(c){
+                case 0:  d = 'H'; break;
+                case 21: d = '0'; break;
+                case 3:  d = '1'; break;
+                case 25: d = '2'; break;
+                case 27: d = '3'; break;
+                case 15: d = '4'; break;
+                case 30: d = '5'; break;
+                case 28: d = '6'; break;
+                case 19: d = '7'; break;
+                case 29: d = '8'; break;
+                case 31: d = '9'; break;
+            }
+            return d;
+        }
+
+        // process a DSKY output (channels 8 or 9)
+        function process(d){            
+            var chan = d >> 16;     // data returned by scanPort is packed as (chan<<16)+val
+            d &= 0xffff;            // now d is val in the output packet
+
+            if(chan === 8){
+                if(!d) return flag;
+                var aa = (d >> 11); // see http://www.ibiblio.org/apollo/developer.html for what aa, bb, d1 and d2 are!                                
+                var bb = (d >> 10) & 1;
+                var d1 = getDigit((d >> 5) & 0x1f);
+                var d2 = getDigit(d & 0x1f);                
+
+                switch(aa){
+                    case 12:    // spacial case for the indicator lights
+                        status8 = d;                         
+                        break;
+                    case 11: 
+                        digits[0] = d1;
+                        digits[1] = d2;
+                        break;
+                    case 10: 
+                        digits[2] = d1;
+                        digits[3] = d2;
+                        break;
+                    case 9: 
+                        digits[4] = d1;
+                        digits[5] = d2;
+                        break;
+                    case 8:                 
+                        digits[7] = d2;
+                        break;
+                    case 7: 
+                        digits[8] = d1;
+                        digits[9] = d2;
+                        sign1p = bb;
+                        break;
+                    case 6: 
+                        digits[10] = d1;
+                        digits[11] = d2;
+                        sign1m = bb;
+                        break;
+                    case 5: 
+                        digits[13] = d1;
+                        digits[14] = d2;
+                        sign2p = bb;
+                        break;
+                    case 4: 
+                        digits[15] = d1;
+                        digits[16] = d2;
+                        sign1m = bb;
+                        break;
+                    case 3: 
+                        digits[17] = d1;
+                        digits[19] = d2;
+                        break;
+                    case 2: 
+                        digits[20] = d1;
+                        digits[21] = d2;
+                        sign3p = bb;
+                        break;
+                    case 1: 
+                        digits[22] = d1;
+                        digits[23] = d2;
+                        sign1m = bb;
+                        break;
+                }  
+
+                flag |= (aa==12 ? 2 : 1);   // flag determines which area of the screen needs refreshing
+
+                // assigns the correct sign symbol
+                digits[6] = (sign1p && !sign1m ? '+' : (!sign1p && !sign1m ? 'H' : '-')); // H means space and will be replaced in updateDsky
+                digits[12] = (sign2p && !sign2m ? '+' : (!sign2p && !sign2m ? 'H' : '-'));
+                digits[18] = (sign3p && !sign3m ? '+' : (!sign3p && !sign3m ? 'H' : '-')); 
+            } else if(chan === 9){
+                status9 = d;
+                flag |= 4;
+            } else if(chan === 11){
+                status11 = d & 0x0200;
+                flag |= 8;                
+            }
+            return flag;
+        }
+
+        function update(){            
+            var s = digits.join('');
+            var on = (phase>>1) & 3; // to simulate blinking (phase increases by 1 every 100 ms)                                        
+            
+            if(flag & 1){   // bit 0 of flag is set, update digits                
+                $('#R1').html(s.slice(6,12).replace(/H/g, '&nbsp;')); // replaced H with space since spaces confuses String.join
+                $('#R2').html(s.slice(12,18).replace(/H/g, '&nbsp;'));
+                $('#R3').html(s.slice(18,24).replace(/H/g, '&nbsp;'));        
+                $('#prog00').html(s.slice(0,2).replace(/H/g, '&nbsp;'));
+            }
+
+            if((flag & 1) || (status9 & 0x0020)){   // VERB and NOUN are updated if flag bit 0 is set or DSKY is in the blinking mode                
+                if(!(status9 & 0x0020) || on){  
+                    $('#verb00').html(s.slice(2,4).replace(/H/g, '&nbsp;'));
+                    $('#noun00').html(s.slice(4,6).replace(/H/g, '&nbsp;'));
+                } else {
+                    $('#verb00').html('&nbsp;&nbsp;');
+                    $('#noun00').html('&nbsp;&nbsp;');
+                }
+            }
+    
+            if(flag & 2){   // also see http://klabs.org/history/history_docs/mit_docs/1709.pdf section 1.9.3
+                $('#vel').css('background-color', status8 & 0x0004 ? '#ffc200' : '#888888');
+                $('#no_att').css('background-color', status8 & 0x0008 ? '#ffffff' : '#888888');
+                $('#alt').css('background-color', status8 & 0x0010 ? '#ffc200' : '#888888');
+                $('#gimbal_lock').css('background-color', status8 & 0x0020 ? '#ffc200' : '#888888');
+                $('#tracker').css('background-color', status8 & 0x0080 ? '#ffc200' : '#888888');
+                $('#prog').css('background-color', status8 & 0x0100 ? '#ffc200' : '#888888');        
+            }
+
+            if(flag & 4){                
+                $('#comp_acty').css('background-color', status9 & 0x0002 ? '#ffc200' : '#888888');
+                $('#uplink_acty').css('background-color', status9 & 0x0004 ? '#ffffff' : '#888888');
+                $('#temp').css('background-color', status9 & 0x0008 ? '#ffc200' : '#888888');                
+            }            
+
+            if((flag & 4) || (status9 & 0x0050)){   // these two indicators blink
+                $('#key_rel').css('background-color', on && (status9 & 0x0010) ? '#ffffff' : '#888888');
+                $('#opr_err').css('background-color', on && (status9 & 0x0040) ? '#ffffff' : '#888888');
+            }
+
+            if(flag & 8){                
+                $('#stby').css('background-color', status11 & 0x0200 ? '#ffffff' : '#888888');
+            }
+
+            flag = 0;   // are screens that needed to be updated are actually updated! 
+        }        
+
+        return {
+            process: process,
+            update: update,
+            tick: function(){ phase++; }
+        }
+    })();   // dsky
+
+    
+    $('.key').click(function(event){
+        sendPort(13, parseInt(event.target.name));  // sends the key to the input channel 13 = 015
+    });    
+
+    $('#pro').click(function(event){   
+        sendPort(282, 0x2000);  // 282 = 0432   note that octal literals are not supported in the strict mode
+        sendPort(26, 0);        // 26 = 032
+
+        setTimeout(function(){  // simulates a keyup event          
+            sendPort(282, 0x2000);  
+            sendPort(26, 0x2000);   
+        }, 200);
+    });
+
+    /*
+        This is the main program loop.
+        It runs every 100 ms and in turn executes the agc engine.        
+    */
+    setInterval(function(){
+        var i, d;        
+
+        dsky.tick();
+
+        for(i=0; i<10; i++){
+            advance();                  // runs agc engine for 10 ms
+            d = scanPort(0x00000B00);   // scan for ports 8, 9 and 11
+            if(d){
+                dsky.process(d);
+            }
+        }
+        
+        dsky.update();
+    }, 100);    
+
+    </script>
+  </body>
+</html>
+
